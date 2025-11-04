@@ -11,21 +11,19 @@ st.set_page_config(
 )
 
 # -------------------------------
-# 🌸 背景デザイン & 桜吹雪アニメーション
+# 🌸 背景 + 桜吹雪アニメーション（確実に動作する版）
 # -------------------------------
-sakura_animation = """
+sakura_css = """
 <style>
-/* 背景画像 */
+/* 背景 */
 [data-testid="stAppViewContainer"] {
-    background-image: linear-gradient(to bottom, #fff8e7, #fceabb);
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+    background: linear-gradient(to bottom, #fffaf0, #fde8b8);
     color: #3b1e00;
     font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+    overflow: hidden;
 }
 
-/* ボタン */
+/* ボタンデザイン */
 div.stButton > button {
     background: linear-gradient(180deg, #fff5cc, #f7d774);
     color: #3b1e00;
@@ -42,27 +40,29 @@ div.stButton > button:hover {
     transform: scale(1.05);
 }
 
-/* 桜吹雪パーティクル */
+/* 桜の花びら（固定画像を使用） */
 .sakura {
     position: fixed;
     top: -10px;
-    background-image: url('https://raw.githubusercontent.com/miiton/CSS-Sakura/master/sakura.png');
-    background-size: contain;
     width: 25px;
     height: 25px;
-    animation: fall 10s linear infinite;
+    background-image: url('https://raw.githubusercontent.com/miiton/CSS-Sakura/master/sakura.png');
+    background-size: contain;
+    background-repeat: no-repeat;
     opacity: 0.9;
-    z-index: -1;
+    z-index: 0;
+    pointer-events: none;
+    animation-name: fall;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
 }
 
+/* アニメーション定義 */
 @keyframes fall {
     0% {
         transform: translateX(0) rotate(0deg);
         top: -10px;
         opacity: 1;
-    }
-    50% {
-        opacity: 0.9;
     }
     100% {
         transform: translateX(200px) rotate(360deg);
@@ -70,18 +70,28 @@ div.stButton > button:hover {
         opacity: 0;
     }
 }
-
-/* 複数桜生成 */
+</style>
 """
-# 桜を複数個配置
-for i in range(25):
-    sakura_animation += f".sakura:nth-child({i+1}) {{ left: {i*4}%; animation-delay: {i*0.8}s; }}\n"
-sakura_animation += "</style>\n"
+st.markdown(sakura_css, unsafe_allow_html=True)
 
-# HTMLとして桜要素を追加
-sakura_html = "".join(["<div class='sakura'></div>" for _ in range(25)])
-
-st.markdown(sakura_animation + sakura_html, unsafe_allow_html=True)
+# 🌸 複数の桜を生成（JSでアニメ時間をずらす）
+sakura_js = """
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const numPetals = 30;
+    for (let i = 0; i < numPetals; i++) {
+        const petal = document.createElement('div');
+        petal.className = 'sakura';
+        petal.style.left = Math.random() * 100 + 'vw';
+        petal.style.animationDuration = 6 + Math.random() * 6 + 's';
+        petal.style.animationDelay = Math.random() * 5 + 's';
+        petal.style.transform = 'scale(' + (0.5 + Math.random() * 0.8) + ')';
+        document.body.appendChild(petal);
+    }
+});
+</script>
+"""
+st.markdown(sakura_js, unsafe_allow_html=True)
 
 # -------------------------------
 # 🐴 タイトル
